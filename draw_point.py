@@ -297,7 +297,7 @@ class MyApp(QMainWindow):
         # test if two lines cross
         idx = 81
         self.test_line_idx = idx
-        if self.TestCross([self.x_min, self.y_min], [(x1+x3)*0.5, (y1+y3)*0.5], [bzPoints[idx].x, bzPoints[idx].y], [bzPoints[idx+1].x, bzPoints[idx+1].y]):
+        if line.TestCross(line.Line(self.x_min, self.y_min, (x1+x3)*0.5, (y1+y3)*0.5), line.Line(bzPoints[idx].x, bzPoints[idx].y, bzPoints[idx+1].x, bzPoints[idx+1].y)):
             print('TestCross = True')
         else:
             print('TestCross = False')
@@ -309,30 +309,6 @@ class MyApp(QMainWindow):
                 cross_cnt = cross_cnt + 1
         print('cross_cnt=%d'%cross_cnt)
         self.repaint()
-    def LineCoef(self, p1, p2):
-        x1 = p1[0]
-        x2 = p2[0]
-        y1 = p1[1]
-        y2 = p2[1]
-        a = (y1-y2)/(x1 - x2)
-        b = (-x2*y1 + x1*y2)/(x1 - x2)
-        return (a, b)
-
-    def TestCross(self, p1, p2, p3, p4):
-        (a1, b1) = self.LineCoef(p1, p2)
-        (a2, b2) = self.LineCoef(p3, p4)
-        print(a1)
-        print(b1)
-        print(a2)
-        print(b2)
-
-        self.x_sol = (-b1 + b2)/(a1 - a2)
-        self.y_sol = (-a2*b1 + a1*b2)/(a1 - a2)
-        print('x_sol=%.3f, y_sol=%.3f'%(self.x_sol, self.y_sol))
-        if (self.x_sol - p1[0])*(self.x_sol - p2[0]) < 0 and (self.x_sol - p3[0])*(self.x_sol - p4[0]) < 0:
-            return True
-        else:
-            return False
 
     def MoveUp(self):
         self.v_org_y = self.v_org_y + self.h / self.scale * 0.1
