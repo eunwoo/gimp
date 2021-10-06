@@ -627,7 +627,7 @@ class MyApp(QMainWindow):
             qp.drawPoint(int(x1), int(y1))
 
     def draw_control_point(self, qp):
-        qp.setPen(QPen(Qt.red, 2))
+        qp.setPen(QPen(Qt.red, 1))
         for i in range(len(bzPoints)):
             x = self.vw_to_scr_x(bzPoints[i].x)
             y = self.vw_to_scr_y(bzPoints[i].y)
