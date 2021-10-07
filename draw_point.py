@@ -2,10 +2,11 @@
 import line
 import sys
 import math
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPainter, QPen, QWheelEvent, QColor
-from PyQt5.QtCore import Qt
-from PyQt5 import QtCore, QtGui
+from PySide6.QtWidgets import *
+from PySide6.QtGui import QPainter, QPen, QWheelEvent, QColor
+from PySide6.QtCore import Qt
+from PySide6 import QtCore, QtGui
+import PySide6
 import json
 import os.path
 
@@ -67,6 +68,7 @@ class MyCanvas(QWidget):
         super().__init__()
 
     def wheelEvent(self, event: QWheelEvent):
+        self.parent.wheelEvent(event)
         print('wheel')
 
     def mouseMoveEvent(self, a0: QtGui.QMouseEvent) -> None:
@@ -87,7 +89,6 @@ class MyApp(QMainWindow):
         self.showControlPoint = True
         self.movePoint = True
         self.selected_point = -1
-        self.angle = 30.0
         self.zoomFactor = 1.2
         if os.path.isfile('config.json') == True:
             fp = open('config.json', 'r')
@@ -100,10 +101,21 @@ class MyApp(QMainWindow):
             else: self.v_org_y = 0
             if config.get('v_w'): self.v_w = config['v_w']
             else: self.v_w = 600
+            if config.get('v_h'): self.v_h = config['v_h']
+            else: self.v_h = 600
+            if config.get('width'): self.w = config['width']
+            else: self.w = 600
+            if config.get('height'): self.h = config['height']
+            else: self.h = 600
+        else:
+            self.w = 600
+            self.h = 600
+            self.angle = 30.0
+            self.v_org_x = 0
+            self.v_org_y = 0
+            self.v_w = 600
+            self.v_h = self.v_w
 
-        self.v_h = self.v_w
-        self.w = 600
-        self.h = 600
         self.zoomInCenterX = self.w*0.5
         self.zoomInCenterY = self.h*0.5
 
@@ -219,6 +231,11 @@ class MyApp(QMainWindow):
         self.setMouseTracking(True)
         self.statusbar = self.statusBar()
         self.show()
+    def resizeEvent(self, event: PySide6.QtGui.QResizeEvent) -> None:
+        self.w = self.width()
+        self.h = self.height()
+        print('v, w=%d, %d'%(self.v,self.w))
+        return super().resizeEvent(event)
 
     def closeEvent(self, e):
         fp = open('config.json', 'w')
@@ -227,6 +244,9 @@ class MyApp(QMainWindow):
         config['v_org_x'] = self.v_org_x
         config['v_org_y'] = self.v_org_y
         config['v_w'] = self.v_w
+        config['v_h'] = self.v_h
+        config['width'] = self.w
+        config['height'] = self.h
         json.dump(config, fp)
         fp.close()
 
@@ -644,6 +664,6 @@ class MyApp(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MyApp()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
     
