@@ -133,89 +133,75 @@ class MyApp(QMainWindow):
         layout2 = QVBoxLayout()
         self.chkShowControlPoint = QCheckBox("Show Control Point", self)
         self.chkShowControlPoint.setChecked(self.showControlPoint)
-        self.chkShowControlPoint.resize(150, 28)
-        self.chkShowControlPoint.move(self.w - self.chkShowControlPoint.sizeHint().width() - 10, 5)
         self.chkShowControlPoint.stateChanged.connect(self.chkShowControlPoint_clicked)
-        self.chkShowControlPoint.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.chkShowControlPoint.setFixedWidth(150)
+        self.chkShowControlPoint.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        # self.chkShowControlPoint.setFixedWidth(150)
         layout2.addWidget(self.chkShowControlPoint)
 
         self.btnViewUp = QPushButton("Up", self)
-        self.btnViewUp.move(self.w - self.btnViewUp.sizeHint().width() - 10, 30)
         self.btnViewUp.clicked.connect(self.btnViewUp_clicked)
-        self.btnViewUp.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.btnViewUp.setFixedWidth(150)
+        self.btnViewUp.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        # self.btnViewUp.setFixedWidth(150)
         layout2.addWidget(self.btnViewUp)
         self.btnViewDown = QPushButton("Down", self)
-        self.btnViewDown.move(self.w - self.btnViewDown.sizeHint().width() - 10, 60)
         self.btnViewDown.clicked.connect(self.btnViewDown_clicked)
-        self.btnViewDown.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.btnViewDown.setFixedWidth(150)
+        self.btnViewDown.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        # self.btnViewDown.setFixedWidth(150)
         layout2.addWidget(self.btnViewDown)
         self.btnViewLeft = QPushButton("Left", self)
-        self.btnViewLeft.move(self.w - self.btnViewLeft.sizeHint().width() - 10, 90)
         self.btnViewLeft.clicked.connect(self.btnViewLeft_clicked)
-        self.btnViewLeft.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.btnViewLeft.setFixedWidth(150)
+        self.btnViewLeft.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        # self.btnViewLeft.setFixedWidth(150)
         layout2.addWidget(self.btnViewLeft)
         self.btnViewRight = QPushButton("Right", self)
-        self.btnViewRight.move(self.w - self.btnViewRight.sizeHint().width() - 10, 120)
         self.btnViewRight.clicked.connect(self.btnViewRight_clicked)
-        self.btnViewRight.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.btnViewRight.setFixedWidth(150)
+        self.btnViewRight.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        # self.btnViewRight.setFixedWidth(150)
         layout2.addWidget(self.btnViewRight)
 
         self.btnZoomIn = QPushButton("Zoom In", self)
-        self.btnZoomIn.move(self.w - self.btnZoomIn.sizeHint().width() - 10, 150)
         self.btnZoomIn.clicked.connect(self.btnZoomIn_clicked)
-        self.btnZoomIn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.btnZoomIn.setFixedWidth(150)
+        self.btnZoomIn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        # self.btnZoomIn.setFixedWidth(150)
         layout2.addWidget(self.btnZoomIn)
         self.btnZoomOut = QPushButton("Zoom Out", self)
-        self.btnZoomOut.move(self.w - self.btnZoomOut.sizeHint().width() - 10, 180)
         self.btnZoomOut.clicked.connect(self.btnZoomOut_clicked)
-        self.btnZoomOut.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.btnZoomOut.setFixedWidth(150)
+        self.btnZoomOut.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        # self.btnZoomOut.setFixedWidth(150)
         layout2.addWidget(self.btnZoomOut)
 
         self.chkRunMovePoint = QCheckBox("Move Point", self)
         self.chkRunMovePoint.setChecked(self.movePoint)
-        self.chkRunMovePoint.move(self.w - self.chkRunMovePoint.sizeHint().width() - 10, 210)
         self.chkRunMovePoint.stateChanged.connect(self.chkMovePoint_clicked)
-        self.chkRunMovePoint.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
+        self.chkRunMovePoint.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
         self.chkRunMovePoint.setFixedWidth(150)
         layout2.addWidget(self.chkRunMovePoint)
 
         self.btnDetectConvex = QPushButton("Detect Convex Point", self)
-        self.btnDetectConvex.move(self.w - self.btnDetectConvex.sizeHint().width() - 10, 240)
-        self.btnDetectConvex.resize(150,28)
+        # self.btnDetectConvex.resize(150,28)
         self.btnDetectConvex.clicked.connect(self.btnDetectConvex_clicked)
-        self.btnDetectConvex.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.btnDetectConvex.setFixedWidth(150)
+        self.btnDetectConvex.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
         layout2.addWidget(self.btnDetectConvex)
 
         layout3 = QHBoxLayout()
         self.lblAngle = QLabel('Angle: ', self)
         self.lblAngle.resize(50,28)
-        self.lblAngle.move(self.w - 100 - 5, 270)
         self.lblAngle.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.lblAngle.setFixedWidth(50)
+        # self.lblAngle.setFixedWidth(50)
         layout3.addWidget(self.lblAngle)
         self.edtAngle = QLineEdit(self)
         self.edtAngle.setText(str(self.angle))
-        self.edtAngle.resize(50,28)
-        self.edtAngle.move(self.w - 50 - 5, 270)
+        # self.edtAngle.resize(50,28)
         self.edtAngle.textChanged.connect(self.edtAngle_textChanged)
         self.edtAngle.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.edtAngle.setFixedWidth(50)
+        # self.edtAngle.setFixedWidth(50)
         layout3.addWidget(self.edtAngle)
         layout2.addLayout(layout3)
 
         self.btnCalcInOut = QPushButton("Check In/Out", self)
-        self.btnCalcInOut.move(self.w - self.btnCalcInOut.sizeHint().width() - 10, 300)
         self.btnCalcInOut.clicked.connect(self.btnCalcInOut_clicked)
-        self.btnCalcInOut.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        self.btnCalcInOut.setFixedWidth(150)
+        self.btnCalcInOut.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        # self.btnCalcInOut.setFixedWidth(150)
         layout2.addWidget(self.btnCalcInOut)
         layout2.setAlignment(Qt.AlignmentFlag.AlignTop)
 
@@ -223,7 +209,7 @@ class MyApp(QMainWindow):
         self.canvas = MyCanvas(self)
         self.canvas.setMouseTracking(True)
         layout1.addWidget(self.canvas,100)
-        layout1.addLayout(layout2,20)
+        layout1.addLayout(layout2,10)
         widget.setLayout(layout1)
 
         self.setCentralWidget(widget)
@@ -234,7 +220,7 @@ class MyApp(QMainWindow):
     def resizeEvent(self, event: PySide6.QtGui.QResizeEvent) -> None:
         self.w = self.width()
         self.h = self.height()
-        print('v, w=%d, %d'%(self.v,self.w))
+        print('w, h=%d, %d'%(self.w,self.h))
         return super().resizeEvent(event)
 
     def closeEvent(self, e):
@@ -268,10 +254,10 @@ class MyApp(QMainWindow):
                 self.update()
         elif self.bShift == False:
             if event.angleDelta().y() > 0:
-                self.MoveUp()
+                self.MoveDown()
                 self.update()
             else:
-                self.MoveDown()
+                self.MoveUp()
                 self.update()
         else:
             if event.angleDelta().y() > 0:
@@ -295,8 +281,8 @@ class MyApp(QMainWindow):
             self.bShift = False
 
     def mouseMoveEvent(self, event):
-        x = event.x()
-        y = event.y()
+        x = event.position().x()
+        y = event.position().y()
         self.mouse_x = x
         self.mouse_y = y
         msg = 'mouseMoveEvent: x=%d, y=%d' % (event.x(), event.y())
@@ -578,6 +564,7 @@ class MyApp(QMainWindow):
         # qp.drawLine(0,0,int(self.w/2),int(self.h/2))
         self.draw_line(qp)
         self.draw_point(qp)
+        self.draw_curve(qp)
         if self.showControlPoint:
             self.draw_control_point(qp)
         if self.selected_point != -1:
@@ -623,7 +610,7 @@ class MyApp(QMainWindow):
         qp.end()
 
     def draw_line(self, qp):
-        qp.setPen(QPen(Qt.blue, 2))
+        qp.setPen(QPen(Qt.cyan, 2))
         for i in range(int(len(num)/6)-1):
             x1 = self.vw_to_scr_x(bzPoints[i].x)
             y1 = self.vw_to_scr_y(bzPoints[i].y)
@@ -641,7 +628,7 @@ class MyApp(QMainWindow):
             if bzPoints[i].acute == True:
                 qp.setPen(QPen(Qt.red, 5))
             else:
-                qp.setPen(QPen(Qt.yellow, 5))
+                qp.setPen(QPen(Qt.darkGreen, 5))
             x1 = self.vw_to_scr_x(bzPoints[i].x)
             y1 = self.vw_to_scr_y(bzPoints[i].y)
             qp.drawPoint(int(x1), int(y1))
@@ -660,6 +647,36 @@ class MyApp(QMainWindow):
             y1 = self.vw_to_scr_y(bzPoints[i].y_g2)
             qp.drawPoint(int(x1), int(y1))
             qp.drawLine(int(x), int(y), int(x1), int(y1))
+
+    def draw_curve(self, qp):
+        qp.setPen(QPen(Qt.red, 1))
+        for i in range(len(bzPoints)):
+            if i == 0 or i == len(bzPoints)-1:
+                continue
+            for t_step in range(100):
+                t = t_step*0.01
+                # P12t = P1 + t*P12 = Pa
+                P12tx = bzPoints[i].x + t*(bzPoints[i].x_g2 - bzPoints[i].x)
+                P12ty = bzPoints[i].y + t*(bzPoints[i].y_g2 - bzPoints[i].y)
+                # P23t = P2 + t*P23 = Pb
+                P23tx = bzPoints[i].x_g2 + t*(bzPoints[i+1].x_g1 - bzPoints[i].x_g2)
+                P23ty = bzPoints[i].y_g2 + t*(bzPoints[i+1].y_g1 - bzPoints[i].y_g2)
+                # P34t = P3 + t*P34 = Pc
+                P34tx = bzPoints[i+1].x_g1 + t*(bzPoints[i+1].x - bzPoints[i+1].x_g1)
+                P34ty = bzPoints[i+1].y_g1 + t*(bzPoints[i+1].y - bzPoints[i+1].y_g1)
+                # Pab = Pa + t*(Pb - Pa)
+                Pabx = P12tx + t*(P23tx - P12tx)
+                Paby = P12ty + t*(P23ty - P12ty)
+                # Pbc = Pb + t*(Pc - Pb)
+                Pbcx = P23tx + t*(P34tx - P23tx)
+                Pbcy = P23ty + t*(P34ty - P23ty)
+                # P = Pab + t*(Pbc - Pab)
+                Px = Pabx + t*(Pbcx - Pabx)
+                Py = Paby + t*(Pbcy - Paby)
+                x1 = self.vw_to_scr_x(Px)
+                y1 = self.vw_to_scr_y(Py)
+                qp.drawPoint(int(x1), int(y1))
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
