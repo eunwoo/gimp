@@ -24,6 +24,7 @@ class MyCanvas(QWidget):
         self.bCtrl = False
         self.bShift = False
         self.showControlPoint = True
+        self.show_line = True
         self.selected_point = -1
         self.zoomFactor = 1.2
         
@@ -116,20 +117,17 @@ class MyCanvas(QWidget):
             self.selected_point = sel_i
             self.repaint()            
     def keyPressEvent(self, e):
-        print('key press event')
         if e.key() == Qt.Key_Control:
             self.bCtrl = True
         elif e.key() == Qt.Key_Shift:
             self.bShift = True
     def keyReleaseEvent(self, e):
-        print('key release event')
         if e.key() == Qt.Key_Control:
             self.bCtrl = False
         elif e.key() == Qt.Key_Shift:
             self.bShift = False
 
     def paintEvent(self, e):
-        print('cavnas paint event')
         qp = QPainter(self)
         self.Draw(qp)
 
@@ -148,14 +146,12 @@ class MyCanvas(QWidget):
     def MoveRight(self):
         self.v_org_x = self.v_org_x - self.w / self.scale * 0.1
     def zoomIn(self, x, y):
-        print('zoom in')
         self.scale = self.scale * self.zoomFactor
         self.v_org_x = self.v_org_x + x/self.scale*(self.zoomFactor - 1.0)
         self.v_org_y = self.v_org_y + y/self.scale*(self.zoomFactor - 1.0)
         self.v_w = self.w/self.scale
         self.v_h = self.h/self.scale
     def zoomOut(self, x, y):
-        print('zoom out')
         self.scale = self.scale / self.zoomFactor
         self.v_org_x = self.v_org_x + x/self.scale*(1.0-self.zoomFactor)/self.zoomFactor
         self.v_org_y = self.v_org_y + y/self.scale*(1.0-self.zoomFactor)/self.zoomFactor
@@ -176,7 +172,8 @@ class MyCanvas(QWidget):
 
     def Draw(self, qp):
         qp.fillRect(QRect(0,0,self.width(),self.height()), QBrush(QColor(0, 0, 10, 255)))
-        self.draw_line(qp)
+        if self.show_line == True:
+            self.draw_line(qp)
         self.draw_point(qp)
         if self.show_curve == True:
             self.draw_curve(qp)
@@ -260,7 +257,7 @@ class MyCanvas(QWidget):
             qp.drawPoint(int(x1), int(y1))
 
     def draw_control_point(self, qp):
-        qp.setPen(QPen(Qt.red, 1))
+        qp.setPen(QPen(Qt.yellow, 1))
         for i in range(len(self.bzPoints)):
             x = self.vw_to_scr_x(self.bzPoints[i].x)
             y = self.vw_to_scr_y(self.bzPoints[i].y)

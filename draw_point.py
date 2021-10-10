@@ -4,9 +4,9 @@ import line
 import sys
 import math
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QPainter, QPen, QWheelEvent, QColor, QIcon
+from PySide6.QtGui import QIcon, QAction, QFont
 from PySide6.QtCore import Qt
-from PySide6 import QtCore, QtGui
+from PySide6 import QtCore
 import PySide6
 import json
 import os.path
@@ -39,13 +39,34 @@ class MyGroupBox(QGroupBox):
     def repaintEvent():
         print('p')
 
+AppName = 'drawLine'
+DefaultDataFile = 'data.txt'
+
 class MyApp(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.loadDefaultVar()
         self.initUI()
 
+    def loadDefaultVar(self):
+        if os.path.isfile(DefaultDataFile) == True:
+            self.datafile = DefaultDataFile
+        else:
+            self.datafile = ''
+
     def initUI(self):
+
+        openFile = QAction(QIcon('open.png'), 'Open', self)
+        openFile.setShortcut('Ctrl+O')
+        openFile.setStatusTip('Open Data File')
+        openFile.triggered.connect(self.showOpenDialog)
+
+        menubar = self.menuBar()
+        menubar.setNativeMenuBar(False)
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(openFile)
+
         self.bCtrl = False
         self.bShift = False
         self.showControlPoint = True
@@ -61,6 +82,8 @@ class MyApp(QMainWindow):
                 config = json.load(fp)
                 if 'angle' in config: self.angle = config['angle']
                 else: self.angle = 30
+                if 'control_para1' in config: self.ControlPara1 = config['control_para1']
+                else: self.ControlPara1 = 0.3
                 if 'v_org_x' in config: self.v_org_x = config['v_org_x']
                 else: self.v_org_x = 0
                 if 'v_org_y' in config: self.v_org_y = config['v_org_y']
@@ -91,6 +114,12 @@ class MyApp(QMainWindow):
                     else:
                         self.canvas.show_curve = True
                 else: self.canvas.show_curve = True
+                if 'show_line' in config: 
+                    if config['show_line'] == 0:
+                        self.canvas.show_line = False
+                    else:
+                        self.canvas.show_line = True
+                else: self.canvas.show_line = True
             except json.decoder.JSONDecodeError as e:
                 self.LoadDefaultVariable()
         else:
@@ -106,7 +135,7 @@ class MyApp(QMainWindow):
         self.canvas.SetData(self.bzPoints)
 
         self.setGeometry(100, 100, self.top_w, self.top_h)
-        self.setWindowTitle('drawLine')
+        self.setTitle()
         self.setWindowIcon(QIcon('HappyFish.jpg'))
 
         layout1 = QHBoxLayout()
@@ -121,6 +150,11 @@ class MyApp(QMainWindow):
         self.chkShowCurve.stateChanged.connect(self.chkShowCurve_clicked)
         self.chkShowCurve.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
         layoutRightControl.addWidget(self.chkShowCurve)
+        self.chkShowLine = QCheckBox("Show Line", self)
+        self.chkShowLine.setChecked(self.canvas.show_line)
+        self.chkShowLine.stateChanged.connect(self.chkShowLine_clicked)
+        self.chkShowLine.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        layoutRightControl.addWidget(self.chkShowLine)
 
         self.btnViewUp = QPushButton("Up", self)
         self.btnViewUp.clicked.connect(self.btnViewUp_clicked)
@@ -164,32 +198,55 @@ class MyApp(QMainWindow):
         self.rdoRunMoveControl.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
         layoutRunMode.addWidget(self.rdoRunMoveControl)
 
+        self.rdoRunMergePoint = QRadioButton("Merge Point", self)
+        self.rdoRunMergePoint.clicked.connect(self.rdoMergePoint_clicked)
+        self.rdoRunMergePoint.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        layoutRunMode.addWidget(self.rdoRunMergePoint)
+
         if self.run_mode == 0:
             self.rdoRunMovePoint.setChecked(True)
-        else:
+        elif self.run_mode == 1:
             self.rdoRunMoveControl.setChecked(True)
+        else:
+            self.rdoRunMergePoint.setChecked(True)
 
         self.btnDetectConvex = QPushButton("Detect Convex Point", self)
         self.btnDetectConvex.clicked.connect(self.btnDetectConvex_clicked)
         self.btnDetectConvex.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
         layoutRightControl.addWidget(self.btnDetectConvex)
 
-        layout3 = QHBoxLayout()
+        layout3 = QGridLayout()
         self.lblAngle = QLabel('Angle: ', self)
         self.lblAngle.setFixedHeight(30)
         self.lblAngle.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        layout3.addWidget(self.lblAngle)
+        layout3.addWidget(self.lblAngle, 0, 0)
         self.edtAngle = QLineEdit(self)
         self.edtAngle.setText(str(self.angle))
         self.edtAngle.textChanged.connect(self.edtAngle_textChanged)
         self.edtAngle.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
-        layout3.addWidget(self.edtAngle)
+        layout3.addWidget(self.edtAngle, 0, 1)
+
+        self.lblAngle1 = QLabel('Control Para 1: ', self)
+        self.lblAngle1.setFixedHeight(30)
+        self.lblAngle1.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
+        layout3.addWidget(self.lblAngle1, 1, 0)
+        self.edtControlPara1 = QLineEdit(self)
+        self.edtControlPara1.setText(str(self.ControlPara1))
+        self.edtControlPara1.textChanged.connect(self.edtControlPara1_textChanged)
+        self.edtControlPara1.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed))
+        layout3.addWidget(self.edtControlPara1, 1, 1)
         layoutRightControl.addLayout(layout3)
 
         self.btnCalcInOut = QPushButton("Check In/Out", self)
         self.btnCalcInOut.clicked.connect(self.btnCalcInOut_clicked)
         self.btnCalcInOut.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
         layoutRightControl.addWidget(self.btnCalcInOut)
+        layoutRightControl.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        self.btnLoad = QPushButton("Load", self)
+        self.btnLoad.clicked.connect(self.btnLoad_clicked)
+        self.btnLoad.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        layoutRightControl.addWidget(self.btnLoad)
         layoutRightControl.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         layout1.addWidget(self.canvas,100)
@@ -206,13 +263,15 @@ class MyApp(QMainWindow):
         self.top_h = 600
         self.w = 600
         self.h = 600
-        self.angle = 30.0
         self.v_org_x = 0
         self.v_org_y = 0
         self.v_w = 600
         self.v_h = self.v_w
         self.run_mode = 0
         self.show_curve = True
+
+        self.angle = 30.0
+        self.ControlPara1 = 0.3
 
     def resizeEvent(self, event: PySide6.QtGui.QResizeEvent) -> None:
         self.top_w = self.width()
@@ -224,6 +283,7 @@ class MyApp(QMainWindow):
         fp = open('config.json', 'w')
         config = {}
         config['angle'] = self.angle
+        config['control_para1'] = self.ControlPara1
         config['v_org_x'] = self.canvas.v_org_x
         config['v_org_y'] = self.canvas.v_org_y
         config['v_w'] = self.canvas.v_w
@@ -241,18 +301,28 @@ class MyApp(QMainWindow):
             config['show_curve'] = 1
         else:
             config['show_curve'] = 0
+        if self.canvas.show_line:
+            config['show_line'] = 1
+        else:
+            config['show_line'] = 0
         json.dump(config, fp, indent = 2)
         fp.close()
 
     def edtAngle_textChanged(self):
         self.angle = float(self.edtAngle.text())
 
+    def edtControlPara1_textChanged(self):
+        self.ControlPara1 = float(self.edtControlPara1.text())
+        
+
     def mousePressEvent(self, e):
         self.statusbar.showMessage('click')
         if self.run_mode == 0:
             self.runMovePoint(e.position().x(), e.position().y())
-        else:
+        elif self.run_mode == 1:
             self.runMoveControl(e.position().x(), e.position().y())
+        else:
+            self.runMergePoint(e.position().x(), e.position().y())
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Control:
@@ -277,9 +347,15 @@ class MyApp(QMainWindow):
     def rdoMoveControl_clicked(self):
         self.run_mode = 1
         self.repaint()
+    def rdoMergePoint_clicked(self):
+        self.run_mode = 2
+        self.repaint()
         
     def chkShowCurve_clicked(self):
         self.canvas.show_curve = not self.canvas.show_curve
+        self.repaint()
+    def chkShowLine_clicked(self):
+        self.canvas.show_line = not self.canvas.show_line
         self.repaint()
 
     def btnDetectConvex_clicked(self):
@@ -288,9 +364,13 @@ class MyApp(QMainWindow):
             angle_rad = angle_deg * math.pi / 180.0
             self.findSharpPoint(self.bzPoints, angle_rad)
             self.repaint()
-
-    def LoadData(self):
-        f = open("data.txt", 'r')
+    def showOpenDialog(self):
+        fname = QFileDialog.getOpenFileName(self, 'Open Data File', './')
+        if fname[0]:
+            self.datafile = fname[0]
+            self.LoadDataFile(fname[0])
+    def LoadDataFile(self, name):
+        f = open(name, 'r')
         while True:
             lineData = f.readline()
             if not lineData: break
@@ -301,6 +381,18 @@ class MyApp(QMainWindow):
         self.bzPoints = []
         for i in range(int(len(num)/6)):
             self.bzPoints.append(BezierPoint(float(num[i*6]), float(num[i*6+1]), float(num[i*6+2]), float(num[i*6+3]), float(num[i*6+4]), float(num[i*6+5])))
+        self.canvas.SetData(self.bzPoints)
+        self.setTitle()
+        self.repaint()
+
+    def setTitle(self):
+        if self.datafile == '':
+            self.setWindowTitle(AppName)
+        else:
+            self.setWindowTitle(AppName + ' - ' + self.datafile)
+
+    def LoadData(self):
+        self.LoadDataFile('data.txt')
 
     def findBoundingBox(self):
         x_min = self.bzPoints[0].x
@@ -339,7 +431,7 @@ class MyApp(QMainWindow):
         # test if two lines cross
         idx = 81
         self.test_line_idx = idx
-        if line.TestCross(line.Line(self.x_min, self.y_min, (x1+x3)*0.5, (y1+y3)*0.5), line.Line(self.bzPoints[idx].x, self.bzPoints[idx].y, bzPoints[idx+1].x, bzPoints[idx+1].y)):
+        if line.TestCross(line.Line(self.x_min, self.y_min, (x1+x3)*0.5, (y1+y3)*0.5), line.Line(self.bzPoints[idx].x, self.bzPoints[idx].y, self.bzPoints[idx+1].x, self.bzPoints[idx+1].y)):
             print('TestCross = True')
         else:
             print('TestCross = False')
@@ -347,10 +439,12 @@ class MyApp(QMainWindow):
         # test all lines in polygon with test line from test point
         cross_cnt = 0
         for idx in range(len(self.bzPoints)-1):
-            if line.TestCross(line.Line(self.x_min, self.y_min, (x1+x3)*0.5, (y1+y3)*0.5),line.Line(self.bzPoints[idx].x, self.bzPoints[idx].y, bzPoints[idx+1].x, bzPoints[idx+1].y)):
+            if line.TestCross(line.Line(self.x_min, self.y_min, (x1+x3)*0.5, (y1+y3)*0.5),line.Line(self.bzPoints[idx].x, self.bzPoints[idx].y, self.bzPoints[idx+1].x, self.bzPoints[idx+1].y)):
                 cross_cnt = cross_cnt + 1
         print('cross_cnt=%d'%cross_cnt)
         self.repaint()
+    def btnLoad_clicked(self):
+        self.LoadData()
 
     def btnViewUp_clicked(self):
         self.canvas.MoveUp()
@@ -436,6 +530,22 @@ class MyApp(QMainWindow):
                 sel_i = i
         return sel_i
 
+    def searchPointExcept(self, x, y, i_except):
+        x_max = self.canvas.w
+        y_max = self.canvas.h
+        dist_min = math.sqrt(x_max*x_max + y_max*y_max)
+        sel_i = -1
+        for i in range(len(self.bzPoints)):
+            if i == i_except:
+                continue
+            dx = self.bzPoints[i].x - self.canvas.scr_to_vw_x(x)
+            dy = self.bzPoints[i].y - self.canvas.scr_to_vw_y(y)
+            dist = math.sqrt(dx*dx + dy*dy)
+            if dist < dist_min:
+                dist_min = dist
+                sel_i = i
+        return sel_i
+
     def runMovePointByIdex(self, sel_i):
         self.statusbar.showMessage('run selected point[%d]=(%.3f, %.3f)'%(sel_i, self.bzPoints[sel_i].x, self.bzPoints[sel_i].y))
         x = self.bzPoints[sel_i].x
@@ -451,8 +561,8 @@ class MyApp(QMainWindow):
         dx = x_g - x
         dy = y_g - y
         l = math.sqrt(dx*dx + dy*dy)
-        x_g1_new = x + dx*0.3
-        y_g1_new = y + dy*0.3
+        x_g1_new = x + dx*self.ControlPara1
+        y_g1_new = y + dy*self.ControlPara1
         self.bzPoints[sel_i].x_g1 = x_g1_new
         self.bzPoints[sel_i].y_g1 = y_g1_new
 
@@ -483,18 +593,76 @@ class MyApp(QMainWindow):
         self.bzPoints[sel_i].x = x_new
         self.bzPoints[sel_i].y = y_new
 
+    def runMoveControlByIdex(self, sel_i):
+        self.statusbar.showMessage('run selected point[%d]=(%.3f, %.3f)'%(sel_i, self.bzPoints[sel_i].x, self.bzPoints[sel_i].y))
+        x = self.bzPoints[sel_i].x
+        y = self.bzPoints[sel_i].y
+        x_g1_old = self.bzPoints[sel_i].x_g1
+        y_g1_old = self.bzPoints[sel_i].y_g1
+        x_g2_old = self.bzPoints[sel_i].x_g2
+        y_g2_old = self.bzPoints[sel_i].y_g2
+        lg1 = math.sqrt((x-x_g1_old)*(x-x_g1_old)+(y-y_g1_old)*(y-y_g1_old))
+        lg2 = math.sqrt((x-x_g2_old)*(x-x_g2_old)+(y-y_g2_old)*(y-y_g2_old))
+        if sel_i == 0:
+            prev = len(self.bzPoints) - 1
+        else:
+            prev = sel_i - 1
+        x_prev = self.bzPoints[prev].x
+        y_prev = self.bzPoints[prev].y
+        if sel_i == len(self.bzPoints) - 1:
+            next = 0
+        else:
+            next = sel_i + 1
+        x_next = self.bzPoints[next].x
+        y_next = self.bzPoints[next].y
+        lc1 = math.sqrt((x-x_prev)*(x-x_prev)+(y-y_prev)*(y-y_prev))
+        lc2 = math.sqrt((x-x_next)*(x-x_next)+(y-y_next)*(y-y_next))
+        if lg1 < 1.0:
+            dx = x_g2_old - x
+            dy = y_g2_old - y
+            dl = math.sqrt(dx*dx + dy*dy)
+            self.bzPoints[sel_i].x_g1 = x - dx/dl*lg2*lc1/lc2
+            self.bzPoints[sel_i].y_g1 = y - dy/dl*lg2*lc1/lc2
+        if lg2 < 1.0:
+            dx = x_g1_old - x
+            dy = y_g1_old - y
+            dl = math.sqrt(dx*dx + dy*dy)
+            self.bzPoints[sel_i].x_g2 = x - dx/dl*lg1*lc2/lc1
+            self.bzPoints[sel_i].y_g2 = y - dy/dl*lg1*lc2/lc1
+            print('2')
+    def runMergePointByIdex(self, sel_i):
+        x = self.bzPoints[sel_i].x
+        y = self.bzPoints[sel_i].y
+        sel_i2 = self.searchPointExcept(x, y, sel_i)
+        if sel_i < sel_i2:
+            self.bzPoints[sel_i].x_g2 = self.bzPoints[sel_i2].x_g2
+            self.bzPoints[sel_i].y_g2 = self.bzPoints[sel_i2].y_g2
+        else:
+            self.bzPoints[sel_i].x_g1 = self.bzPoints[sel_i2].x_g1
+            self.bzPoints[sel_i].y_g1 = self.bzPoints[sel_i2].y_g1
+        self.bzPoints[sel_i].x = (self.bzPoints[sel_i].x + self.bzPoints[sel_i2].x)*0.5
+        self.bzPoints[sel_i].y = (self.bzPoints[sel_i].y + self.bzPoints[sel_i2].y)*0.5
+        del self.bzPoints[sel_i2]
+
     def runMovePoint(self, x, y):
-        self.statusbar.showMessage('move')
+        self.statusbar.showMessage('runMovePoint')
         sel_i = self.searchPoint(x, y)
         if sel_i != -1:
             self.runMovePointByIdex(sel_i)
             self.repaint()
 
     def runMoveControl(self, x, y):
-        self.statusbar.showMessage('move')
+        self.statusbar.showMessage('runMoveControl')
         sel_i = self.searchPoint(x, y)
         if sel_i != -1:
-            self.runMovePointByIdex(sel_i)
+            self.runMoveControlByIdex(sel_i)
+            self.repaint()
+
+    def runMergePoint(self, x, y):
+        self.statusbar.showMessage('runMergePoint')
+        sel_i = self.searchPoint(x, y)
+        if sel_i != -1:
+            self.runMergePointByIdex(sel_i)
             self.repaint()
 
 if __name__ == '__main__':

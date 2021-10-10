@@ -13,9 +13,6 @@ class MainWidget(QWidget):
         self.resize(400,200)
         self.show()
 
-    def paintEvent(self, e):
-        print('paint')
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MainWidget()

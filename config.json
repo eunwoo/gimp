@@ -1,14 +1,16 @@
 {
   "angle": 90.0,
-  "v_org_x": 255.04652858941503,
-  "v_org_y": 100.56171864222411,
-  "v_w": 38.756707123526546,
-  "v_h": 29.592559626338,
-  "width": 1013,
-  "height": 659,
-  "canvas_width": 812,
-  "canvas_height": 620,
-  "run_mode": 0,
+  "control_para1": 0.7,
+  "v_org_x": 311.58163223978005,
+  "v_org_y": 233.98663950038326,
+  "v_w": 162.74737691695722,
+  "v_h": 130.5262695071687,
+  "width": 1041,
+  "height": 697,
+  "canvas_width": 793,
+  "canvas_height": 636,
+  "run_mode": 2,
   "show_control_point": 1,
-  "show_curve": 1
+  "show_curve": 1,
+  "show_line": 1
 }
