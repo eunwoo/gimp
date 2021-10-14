@@ -1,3 +1,3 @@
 # gimp
 
-![image](https://user-images.githubusercontent.com/8966503/136666229-df7991a7-b0ff-4c98-8c27-caf91c3dfb57.png)
+![image](https://user-images.githubusercontent.com/8966503/136702060-95da614c-bfdf-4d72-8e41-44d02536ec3c.png)
