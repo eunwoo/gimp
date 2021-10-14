@@ -5,7 +5,7 @@ import sys
 import math
 from PySide6.QtWidgets import *
 from PySide6.QtGui import QIcon, QAction, QFont
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QDir
 from PySide6 import QtCore
 import PySide6
 import json
@@ -13,6 +13,7 @@ import os.path
 from MainWidget import *
 from BezierPoint import BezierPoint
 from MyCanvas import MyCanvas
+import pathlib
 
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
     QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
@@ -21,26 +22,16 @@ if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
     print('pixmap')
 
-# num = num[0:6*10]
-# for i in range(3):
-#     num.append(200)
-#     num.append(200)
-# for i in range(3):
-#     num.append(200)
-#     num.append(300)
-# for i in range(3):
-#     num.append(300)
-#     num.append(300)
-# for i in range(3):
-#     num.append(300)
-#     num.append(200)
-
 class MyGroupBox(QGroupBox):
     def repaintEvent():
         print('p')
 
 AppName = 'drawLine'
 DefaultDataFile = 'data.txt'
+RUN_MODE_MOVE_POINT = 1
+RUN_MODE_MERGE_POINT = 2
+RUN_MODE_MOVE_CONTROL = 3
+RUN_MODE_FLATTEN_CONTROL = 4
 
 class MyApp(QMainWindow):
 
@@ -51,7 +42,7 @@ class MyApp(QMainWindow):
 
     def loadDefaultVar(self):
         if os.path.isfile(DefaultDataFile) == True:
-            self.datafile = DefaultDataFile
+            self.datafile = os.path.realpath(DefaultDataFile).replace('\\','/')
         else:
             self.datafile = ''
 
@@ -101,7 +92,7 @@ class MyApp(QMainWindow):
                 if 'canvas_height' in config: self.canvas.h = config['canvas_height']
                 else: self.canvas.h = 600
                 if 'run_mode' in config: self.run_mode = config['run_mode']
-                else: self.run_mode = 0
+                else: self.run_mode = RUN_MODE_MOVE_POINT
                 if 'show_control_point' in config: 
                     if config['show_control_point'] == 0:
                         self.canvas.showControlPoint = False
@@ -193,22 +184,29 @@ class MyApp(QMainWindow):
         self.rdoRunMovePoint.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
         layoutRunMode.addWidget(self.rdoRunMovePoint)
 
-        self.rdoRunMoveControl = QRadioButton("Move Control", self)
-        self.rdoRunMoveControl.clicked.connect(self.rdoMoveControl_clicked)
-        self.rdoRunMoveControl.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
-        layoutRunMode.addWidget(self.rdoRunMoveControl)
-
         self.rdoRunMergePoint = QRadioButton("Merge Point", self)
         self.rdoRunMergePoint.clicked.connect(self.rdoMergePoint_clicked)
         self.rdoRunMergePoint.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
         layoutRunMode.addWidget(self.rdoRunMergePoint)
 
-        if self.run_mode == 0:
+        self.rdoRunMoveControl = QRadioButton("Move Control", self)
+        self.rdoRunMoveControl.clicked.connect(self.rdoMoveControl_clicked)
+        self.rdoRunMoveControl.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        layoutRunMode.addWidget(self.rdoRunMoveControl)
+
+        self.rdoRunFlattenControl = QRadioButton("Flatten Control", self)
+        self.rdoRunFlattenControl.clicked.connect(self.rdoFlattenControl_clicked)
+        self.rdoRunFlattenControl.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed))
+        layoutRunMode.addWidget(self.rdoRunFlattenControl)
+
+        if self.run_mode == RUN_MODE_MOVE_POINT:
             self.rdoRunMovePoint.setChecked(True)
-        elif self.run_mode == 1:
+        elif self.run_mode == RUN_MODE_MERGE_POINT:
+            self.rdoRunMergePoint.setChecked(True)
+        elif self.run_mode == RUN_MODE_MOVE_CONTROL:
             self.rdoRunMoveControl.setChecked(True)
         else:
-            self.rdoRunMergePoint.setChecked(True)
+            self.rdoRunFlattenControl.setChecked(True)
 
         self.btnDetectConvex = QPushButton("Detect Convex Point", self)
         self.btnDetectConvex.clicked.connect(self.btnDetectConvex_clicked)
@@ -317,12 +315,14 @@ class MyApp(QMainWindow):
 
     def mousePressEvent(self, e):
         self.statusbar.showMessage('click')
-        if self.run_mode == 0:
+        if self.run_mode == RUN_MODE_MOVE_POINT:
             self.runMovePoint(e.position().x(), e.position().y())
-        elif self.run_mode == 1:
+        elif self.run_mode == RUN_MODE_MERGE_POINT:
+            self.runMergePoint(e.position().x(), e.position().y())
+        elif self.run_mode == RUN_MODE_MOVE_CONTROL:
             self.runMoveControl(e.position().x(), e.position().y())
         else:
-            self.runMergePoint(e.position().x(), e.position().y())
+            self.runFlattenControl(e.position().x(), e.position().y())
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Control:
@@ -342,13 +342,16 @@ class MyApp(QMainWindow):
         self.canvas.showControlPoint = not self.canvas.showControlPoint
         self.repaint()
     def rdoMovePoint_clicked(self):
-        self.run_mode = 0
-        self.repaint()
-    def rdoMoveControl_clicked(self):
-        self.run_mode = 1
+        self.run_mode = RUN_MODE_MOVE_POINT
         self.repaint()
     def rdoMergePoint_clicked(self):
-        self.run_mode = 2
+        self.run_mode = RUN_MODE_MERGE_POINT
+        self.repaint()
+    def rdoMoveControl_clicked(self):
+        self.run_mode = RUN_MODE_MOVE_CONTROL
+        self.repaint()
+    def rdoFlattenControl_clicked(self):
+        self.run_mode = RUN_MODE_FLATTEN_CONTROL
         self.repaint()
         
     def chkShowCurve_clicked(self):
@@ -664,6 +667,14 @@ class MyApp(QMainWindow):
         if sel_i != -1:
             self.runMergePointByIdex(sel_i)
             self.repaint()
+
+    def runFlattenControl(self, x, y):
+        self.statusbar.showMessage('runFlattenPoint')
+        sel_i = self.searchPoint(x, y)
+        if sel_i != -1:
+            self.runMergePointByIdex(sel_i)
+            self.repaint()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
